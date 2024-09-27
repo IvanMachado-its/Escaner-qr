@@ -42,19 +42,33 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     }
-
-    async function validateQRCode(qr) {
-        const response = await fetch('/validate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ qr }),
-        });
-
-        const result = await response.json();
-        document.getElementById('result').textContent = result.message;
-    }
+    
+    document.getElementById('validateButton').addEventListener('click', async () => {
+        const qrCodeInput = document.getElementById('qrInput').value;
+    
+        if (qrCodeInput) {
+            const response = await fetch('/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ qr: qrCodeInput })
+            });
+    
+            const result = await response.json();
+    
+            if (result.message === 'QR válido y registrado como usado') {
+                showNotification('QR válido y registrado como usado', 'success');
+            } else if (result.message === 'El QR ya fue utilizado') {
+                showNotification('El QR ya fue utilizado', 'error');
+            } else {
+                showNotification('QR no encontrado', 'error');
+            }
+        } else {
+            showNotification('Por favor, ingresa un código QR', 'error');
+        }
+    });
+    
 
     document.getElementById('qrForm').addEventListener('submit', async (e) => {
         e.preventDefault();
