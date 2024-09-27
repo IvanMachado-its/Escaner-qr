@@ -16,7 +16,8 @@ function saveQRCodes(qrCodes) {
 
 app.get('/qrcodes', (req, res) => {
     const qrCodes = loadQRCodes();
-    res.json(qrCodes);
+    const usedQRCodes = qrCodes.filter(qrCode => qrCode.used);
+    res.json(usedQRCodes);
 });
 
 app.use(bodyParser.json());
@@ -26,10 +27,6 @@ app.post('/validate', (req, res) => {
     const { qr } = req.body;
     let qrCodes = loadQRCodes();
     const qrCode = qrCodes.find(qrCode => qrCode.code === qr);
-app.get('/qrcodes', (req, res) => {
-    const qrCodes = loadQRCodes();
-    res.json(qrCodes);
-});
 
     if (qrCode) {
         if (!qrCode.used) {
