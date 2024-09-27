@@ -6,52 +6,142 @@
     <title>Validación de Código QR</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #f5f5f5;
+            background-color: #f0f2f5;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            min-height: 100vh;
+            padding: 20px;
         }
+
         .container {
             background-color: #fff;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             text-align: center;
-            max-width: 400px;
+            max-width: 350px;
             width: 100%;
+            animation: fadeIn 0.5s ease;
         }
+
         h1 {
             color: #333;
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 22px;
+            margin-bottom: 18px;
         }
+
         input[type="text"] {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 8px;
             font-size: 16px;
             margin-bottom: 20px;
+            transition: border-color 0.3s ease;
         }
+
+        input[type="text"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
         button {
             background-color: #4CAF50;
             color: white;
             padding: 12px 20px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
+            transition: background-color 0.3s ease;
+            width: 100%;
         }
+
         button:hover {
             background-color: #45a049;
         }
+
+        #startScan {
+            background-color: #2196F3;
+            margin-top: 10px;
+        }
+
+        #startScan:hover {
+            background-color: #1976D2;
+        }
+
         #result {
             margin-top: 20px;
-            font-size: 18px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        #reader {
+            margin: 20px 0;
+            max-width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            input[type="text"] {
+                font-size: 14px;
+            }
+
+            button {
+                font-size: 14px;
+            }
+
+            #result {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+            }
+
+            h1 {
+                font-size: 18px;
+            }
+
+            button {
+                font-size: 12px;
+                padding: 10px 15px;
+            }
+
+            input[type="text"] {
+                padding: 10px;
+            }
+
+            #result {
+                font-size: 13px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -65,12 +155,18 @@
             <button type="submit">Validar</button>
         </form>
         
+        <!-- Botón para escanear QR -->
+        <button id="startScan">Iniciar Escaneo</button>
+        <div id="reader"></div>
+        
         <!-- Resultado -->
         <p id="result"></p>
     </div>
 
+    <!-- Mueve el script de HTML5 QR Code aquí, al final del body -->
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <script>
-        // Validar el código QR ingresado
+        // Validar el código QR ingresado o escaneado
         async function validateQRCode(qr) {
             const response = await fetch('/validate', {
                 method: 'POST',
@@ -89,6 +185,37 @@
             e.preventDefault();
             const qr = document.getElementById('qrInput').value;
             await validateQRCode(qr);
+        });
+
+        // Escanear código QR con la cámara y validar directamente
+        document.getElementById('startScan').addEventListener('click', () => {
+            const html5QrCode = new Html5Qrcode("reader");
+            
+            html5QrCode.start(
+                { facingMode: "environment" }, // Usar cámara trasera
+                {
+                    fps: 10,    // Frames por segundo para escanear
+                    qrbox: { width: 250, height: 250 }  // Tamaño de la ventana de escaneo
+                },
+                qrCodeMessage => {
+                    // Copiar el valor del QR escaneado al input y validarlo
+                    document.getElementById('qrInput').value = qrCodeMessage;
+                    validateQRCode(qrCodeMessage);
+                    
+                    // Detener el escaneo después de leer el código
+                    html5QrCode.stop().then(() => {
+                        console.log('Escaneo detenido.');
+                    }).catch(err => {
+                        console.error('Error al detener el escaneo', err);
+                    });
+                },
+                errorMessage => {
+                    // Mensajes de error (opcional)
+                    console.warn('Error de escaneo:', errorMessage);
+                }
+            ).catch(err => {
+                console.error('Error al iniciar el escaneo', err);
+            });
         });
     </script>
 </body>
