@@ -1,65 +1,82 @@
+/* Reset para asegurar compatibilidad entre navegadores */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #e9ecef;
+    background-color: #f4f7f6; /* Color de fondo claro */
+    color: #333;
     margin: 0;
-    padding: 20px;
+    padding: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     min-height: 100vh;
 }
 
 .container {
     background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 30px;
     width: 100%;
-    max-width: 450px;
+    max-width: 420px;
     text-align: center;
+    transition: box-shadow 0.3s;
+}
+
+.container:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 h1 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #343a40;
+    margin-bottom: 25px;
+    font-size: 26px;
+    color: #3643BA; /* Color de título de Decathlon */
 }
 
 input[type="text"] {
     width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 2px solid #007bff;
-    border-radius: 5px;
+    padding: 14px;
+    margin-bottom: 20px;
+    border: 2px solid #3643BA; /* Borde en color de Decathlon */
+    border-radius: 8px;
     font-size: 16px;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 input[type="text"]:focus {
-    border-color: #0056b3;
+    border-color: #2c3e50; /* Un tono más oscuro para el enfoque */
+    box-shadow: 0 0 8px rgba(44, 62, 80, 0.5);
     outline: none;
 }
 
 button {
-    padding: 12px;
+    padding: 14px;
     width: 100%;
     border: none;
-    border-radius: 5px;
-    background-color: #007bff;
+    border-radius: 8px;
+    background-color: #3643BA; /* Fondo del botón en color de Decathlon */
     color: white;
     font-size: 16px;
     cursor: pointer;
-    margin-bottom: 15px;
-    transition: background-color 0.3s, transform 0.3s;
+    margin-bottom: 20px;
+    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #2c3e50; /* Color más oscuro al pasar el mouse */
     transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 button:active {
     transform: translateY(1px);
+    box-shadow: none;
 }
 
 .hidden {
@@ -73,24 +90,24 @@ button:active {
 }
 
 #qrCodesContainer li {
-    background-color: #f8f9fa;
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: #ecf0f1; /* Fondo claro para la lista */
+    margin: 12px 0;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 #qrList {
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 #reader {
     width: 100%;
-    height: 250px;
-    border: 2px solid #007bff;
-    border-radius: 5px;
-    margin-top: 15px;
-    background-color: #f8f9fa;
+    height: 300px;
+    border: 2px solid #3643BA; /* Borde del área de escaneo en color de Decathlon */
+    border-radius: 8px;
+    margin-top: 20px;
+    background-color: #ecf0f1; /* Fondo claro */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -101,4 +118,48 @@ video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+        max-width: 95%;
+    }
+
+    h1 {
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+
+    input[type="text"], button {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    #reader {
+        height: 250px;
+    }
+}
+
+@media (min-width: 769px) {
+    .container {
+        padding: 40px;
+        max-width: 500px;
+    }
+
+    h1 {
+        font-size: 28px;
+        margin-bottom: 30px;
+    }
+
+    input[type="text"], button {
+        padding: 16px;
+        font-size: 18px;
+    }
+
+    #reader {
+        height: 350px;
+    }
 }
