@@ -19,8 +19,10 @@
         
         <!-- Botón para escanear QR -->
         <button id="startScan">Iniciar Escaneo</button>
+        
+        <!-- Área de visualización de la cámara -->
         <div id="reader" class="hidden">
-            <video></video>
+            <video id="videoElement"></video>
         </div>
         
         <!-- Resultado -->
@@ -37,79 +39,6 @@
     </div>
 
     <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
-    <script>
-        const video = document.createElement("video");
-        let scanning = false;
-
-        async function validateQRCode(qr) {
-            const response = await fetch('/validate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ qr })
-            });
-
-            const result = await response.json();
-            document.getElementById('result').textContent = result.message;
-        }
-
-        document.getElementById('qrForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const qr = document.getElementById('qrInput').value;
-            await validateQRCode(qr);
-        });
-
-        document.getElementById('startScan').addEventListener('click', async () => {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            video.srcObject = stream;
-            video.setAttribute("playsinline", true); // Required to tell iOS Safari we don't want fullscreen
-            await video.play();
-            scanning = true;
-            document.getElementById('reader').classList.remove('hidden'); // Mostrar el área de escaneo
-            scanQRCode();
-        });
-
-        async function scanQRCode() {
-            if (scanning) {
-                const canvasElement = document.createElement("canvas");
-                const canvas = canvasElement.getContext("2d");
-                canvasElement.height = video.videoHeight;
-                canvasElement.width = video.videoWidth;
-                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
-                const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
-                const code = jsQR(imageData.data, canvasElement.width, canvasElement.height);
-
-                if (code) {
-                    document.getElementById('qrInput').value = code.data;
-                    await validateQRCode(code.data);
-                    scanning = false;
-                    video.srcObject.getTracks().forEach(track => track.stop());
-                    document.getElementById('reader').classList.add('hidden'); // Ocultar el área de escaneo
-                    return;
-                }
-                requestAnimationFrame(scanQRCode);
-            }
-        }
-
-        // Mostrar códigos QR utilizados
-        document.getElementById('viewQRCodes').addEventListener('click', async () => {
-            const response = await fetch('/qrcodes');
-            const qrCodes = await response.json();
-            const container = document.getElementById('qrCodesContainer');
-            container.innerHTML = ''; // Limpiar el contenedor
-
-            qrCodes.forEach(qrCode => {
-                if (qrCode.used) { // Solo mostrar los utilizados
-                    const li = document.createElement('li');
-                    li.textContent = `${qrCode.code} - Utilizado`;
-                    container.appendChild(li);
-                }
-            });
-
-            // Mostrar la sección de códigos QR
-            document.getElementById('qrList').classList.remove('hidden');
-        });
-    </script>
+    <script src="js/script.js"></script>
 </body>
 </html>
