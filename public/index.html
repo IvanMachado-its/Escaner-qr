@@ -5,167 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Validación de Código QR</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 350px;
-            width: 100%;
-            animation: fadeIn 0.5s ease;
-        }
-
-        h1 {
-            color: #333;
-            font-size: 22px;
-            margin-bottom: 18px;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            transition: border-color 0.3s ease;
-        }
-
-        input[type="text"]:focus {
-            border-color: #4CAF50;
-            outline: none;
-        }
-
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-            width: 100%;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        #startScan {
-            background-color: #2196F3;
-            margin-top: 10px;
-        }
-
-        #startScan:hover {
-            background-color: #1976D2;
-        }
-
-        #result {
-            margin-top: 20px;
-            font-size: 16px;
-            color: #333;
-        }
-
-        #reader {
-            margin: 20px 0;
-            max-width: 100%;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-
-            h1 {
-                font-size: 20px;
-            }
-
-            input[type="text"] {
-                font-size: 14px;
-            }
-
-            button {
-                font-size: 14px;
-            }
-
-            #result {
-                font-size: 14px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 12px;
-            }
-
-            h1 {
-                font-size: 18px;
-            }
-
-            button {
-                font-size: 12px;
-                padding: 10px 15px;
-            }
-
-            input[type="text"] {
-                padding: 10px;
-            }
-
-            #result {
-                font-size: 13px;
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <div class="container">
         <h1>Validación de Código QR</h1>
-        
+
         <!-- Input manual de QR -->
         <form id="qrForm">
             <input type="text" id="qrInput" placeholder="Ingresa tu código QR" required>
             <button type="submit">Validar</button>
         </form>
-        
+
         <!-- Botón para escanear QR -->
         <button id="startScan">Iniciar Escaneo</button>
-        <div id="reader"></div>
-        
+        <canvas id="cam-canvas" class="d-none"></canvas>
+        <div id="qrDataContainer"></div>
+
         <!-- Resultado -->
         <p id="result"></p>
     </div>
 
-    <!-- Mueve el script de HTML5 QR Code aquí, al final del body -->
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
     <script>
+        const qrDataContainer = document.getElementById('qrDataContainer');
+        const camCanvas = document.getElementById('cam-canvas');
+        const qrInput = document.getElementById('qrInput');
+        const result = document.getElementById('result');
+        let isCamOpen = false;
+        let videoStream = null;
+        let rafID = null;
+
         // Validar el código QR ingresado o escaneado
         async function validateQRCode(qr) {
             const response = await fetch('/validate', {
@@ -175,48 +45,58 @@
                 },
                 body: JSON.stringify({ qr })
             });
-
-            const result = await response.json();
-            document.getElementById('result').textContent = result.message;
+            const resultData = await response.json();
+            result.textContent = resultData.message;
         }
 
         // Manejar el envío manual de QR
         document.getElementById('qrForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const qr = document.getElementById('qrInput').value;
+            const qr = qrInput.value;
             await validateQRCode(qr);
         });
 
-        // Escanear código QR con la cámara y validar directamente
-        document.getElementById('startScan').addEventListener('click', () => {
-            const html5QrCode = new Html5Qrcode("reader");
-            
-            html5QrCode.start(
-                { facingMode: "environment" }, // Usar cámara trasera
-                {
-                    fps: 10,    // Frames por segundo para escanear
-                    qrbox: { width: 250, height: 250 }  // Tamaño de la ventana de escaneo
-                },
-                qrCodeMessage => {
-                    // Copiar el valor del QR escaneado al input y validarlo
-                    document.getElementById('qrInput').value = qrCodeMessage;
-                    validateQRCode(qrCodeMessage);
-                    
-                    // Detener el escaneo después de leer el código
-                    html5QrCode.stop().then(() => {
-                        console.log('Escaneo detenido.');
-                    }).catch(err => {
-                        console.error('Error al detener el escaneo', err);
-                    });
-                },
-                errorMessage => {
-                    // Mensajes de error (opcional)
-                    console.warn('Error de escaneo:', errorMessage);
+        // Función para iniciar o detener la cámara
+        async function toggleCamera() {
+            if (isCamOpen) {
+                cancelAnimationFrame(rafID);
+                videoStream.getTracks().forEach(track => track.stop());
+                isCamOpen = false;
+                camCanvas.classList.add('d-none');
+                qrDataContainer.innerHTML = '';
+                return;
+            }
+
+            isCamOpen = true;
+            camCanvas.classList.remove('d-none');
+            videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            const video = document.createElement('video');
+            video.srcObject = videoStream;
+            video.setAttribute('playsinline', true);
+            video.play();
+
+            requestAnimationFrame(() => tick(video));
+        }
+
+        // Ciclo para escanear QR
+        function tick(video) {
+            const ctx = camCanvas.getContext('2d');
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                camCanvas.width = video.videoWidth;
+                camCanvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0, camCanvas.width, camCanvas.height);
+                const imageData = ctx.getImageData(0, 0, camCanvas.width, camCanvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                if (code) {
+                    qrDataContainer.textContent = code.data;
+                    validateQRCode(code.data); // Validar el QR escaneado
                 }
-            ).catch(err => {
-                console.error('Error al iniciar el escaneo', err);
-            });
-        });
+            }
+            rafID = requestAnimationFrame(() => tick(video));
+        }
+
+        document.getElementById('startScan').addEventListener('click', toggleCamera);
     </script>
 </body>
 </html>
