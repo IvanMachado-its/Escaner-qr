@@ -163,31 +163,34 @@ video {
         height: 350px;
     }
 }
-
-/* Estilos para las alertas */
+/* Contenedor de alertas */
 #alertContainer {
     position: fixed;
-    top: 20px;
+    top: 20px; /* Distancia desde la parte superior */
     left: 50%;
     transform: translateX(-50%);
     z-index: 9999;
-    width: 80%;
-    max-width: 400px;
+    width: 90%;
+    max-width: 400px; /* Ancho máximo */
+    padding: 0 10px;
 }
 
+/* Estilo general de las alertas */
 .alert {
-    padding: 15px 20px;
-    border-radius: 8px;
-    margin-bottom: 15px;
+    padding: 16px 20px; /* Espaciado interno */
+    border-radius: 12px; /* Bordes redondeados */
+    margin-bottom: 15px; /* Espaciado entre alertas */
     color: white;
-    font-size: 16px;
-    font-weight: 500;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    animation: fadeOut 5s forwards; /* Animación para desaparecer después de 5 segundos */
+    font-size: 16px; /* Tamaño de fuente */
+    font-weight: 600; /* Grosor de texto */
+    display: flex; /* Flexbox para el alineamiento */
+    justify-content: space-between; /* Distribución de espacio */
+    align-items: center; /* Alineación vertical */
+    animation: fadeOut 4.5s forwards; /* Animación de desvanecimiento */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra */
 }
 
+/* Diferenciación por tipo de alerta */
 .alert.success {
     background-color: #28a745; /* Verde para éxito */
 }
@@ -196,24 +199,52 @@ video {
     background-color: #dc3545; /* Rojo para error */
 }
 
+/* Ajuste del contenido de la alerta */
+.alert span {
+    flex: 1; /* Ocupa el espacio restante */
+    text-align: left; /* Alinea el texto a la izquierda */
+    margin-right: 10px; /* Espacio entre texto y botón de cierre */
+}
+
+/* Botón de cierre ajustado */
+.alert .close-btn {
+    background: none; /* Sin fondo */
+    border: none; /* Sin borde */
+    color: white; /* Color del texto */
+    font-size: 18px; /* Tamaño del botón */
+    cursor: pointer; /* Cursor de puntero */
+    padding: 0; /* Sin relleno */
+    margin-left: 10px; /* Espacio a la izquierda */
+    transition: color 0.2s ease; /* Transición de color */
+}
+
+/* Efecto al pasar el ratón sobre el botón */
+.alert .close-btn:hover {
+    color: #f8f9fa; /* Color al pasar el ratón */
+}
+
+/* Animación para desvanecer la alerta */
 @keyframes fadeOut {
     0% {
-        opacity: 1;
+        opacity: 1; /* Comienza completamente visible */
     }
-    80% {
-        opacity: 0.8;
+    90% {
+        opacity: 0.9; /* Prácticamente visible */
     }
     100% {
-        opacity: 0;
-        transform: translateY(-20px);
+        opacity: 0; /* Totalmente invisible */
+        transform: translateY(-15px); /* Desplazamiento hacia arriba */
     }
 }
 
-/* Icono de cierre */
-.alert .close-btn {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
+/* Estilos para pantallas pequeñas (móviles) */
+@media (max-width: 600px) {
+    .alert {
+        font-size: 14px; /* Tamaño de fuente en móviles */
+        padding: 12px 16px; /* Relleno reducido */
+    }
+
+    .alert .close-btn {
+        font-size: 16px; /* Tamaño del ícono en móviles */
+    }
 }
