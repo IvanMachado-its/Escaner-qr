@@ -64,3 +64,22 @@ button:hover {
     border: 1px solid #c3e6cb;
     border-radius: 4px;
 }
+.hidden {
+    display: none;
+}
+
+#qrList {
+    margin-top: 20px;
+}
+
+#qrList ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#qrList li {
+    padding: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
